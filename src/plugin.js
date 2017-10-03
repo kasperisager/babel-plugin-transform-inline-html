@@ -21,7 +21,15 @@ export default function ({types: t}) {
 
         const directory = path.dirname(path.resolve(state.file.opts.filename));
         const file = path.resolve(directory, source);
-        const html = minify(fs.readFileSync(file, 'utf8'), htmlMinifier);
+        let html;
+
+        try {
+          html = fs.readFileSync(file, 'utf8');
+        } catch (err) {
+          throw link.buildCodeFrameError('Imported file could not be found');
+        }
+
+        html = minify(html, htmlMinifier);
 
         const {name} = node.specifiers[0].local;
 
