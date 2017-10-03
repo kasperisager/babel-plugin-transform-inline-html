@@ -1,13 +1,15 @@
 import fs from 'fs';
 import path from 'path';
 import {isMatch} from 'micromatch';
+import {minify} from 'html-minifier';
 
 export default function ({types: t}) {
   return {
     visitor: {
       ImportDeclaration(link, state) {
         const {
-          include = '*.html'
+          include = '*.html',
+          htmlMinifier = {}
         } = state.opts;
 
         const node = link.node;
@@ -19,7 +21,7 @@ export default function ({types: t}) {
 
         const directory = path.dirname(path.resolve(state.file.opts.filename));
         const file = path.resolve(directory, source);
-        const html = fs.readFileSync(file, 'utf8');
+        const html = minify(fs.readFileSync(file, 'utf8'), htmlMinifier);
 
         const {name} = node.specifiers[0].local;
 
